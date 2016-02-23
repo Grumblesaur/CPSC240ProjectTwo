@@ -118,13 +118,13 @@ public class Strand {
 		if (firstOffset > secondOffset) {
 			/* first + second */
 			if ((this.length() - firstOffset) != threshold ||
-				(0 + threshold) != secondOffset) {
+				(secondOffset - threshold) == 0) {
 				spliceError = true;
 			}
 		} else if (secondOffset > firstOffset) {
 			/* second + first */
 			if ((other.length() - secondOffset) != threshold ||
-				(0 + threshold) != firstOffset) {
+				(firstOffset - threshold) == 0) {
 				spliceError = true;
 			}
 		} else if (secondOffset == firstOffset) {
@@ -134,7 +134,7 @@ public class Strand {
 		}
 		
 		if (spliceError) {
-			throw new Error("Strands cannot be spliced!");
+			throw new InvalidStateException("Strands cannot be spliced!");
 		}
 				
 		
