@@ -17,6 +17,7 @@ import java.lang.IllegalArgumentException;
 import java.lang.IllegalStateException;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
+import java.lang.IndexOutOfBoundsException;
 
 public class StrandReader {
 	/** Name of file containing DNA Strand information. */
@@ -49,8 +50,13 @@ public class StrandReader {
 		for (int i = 1; i < lines.size(); i += 2) {
 			/* Lines are listed pairwise with no separators but newlines.
 				Empty lines are not an issue. */
-			label = lines.get(i);
-			bases = lines.get(i + 1);
+			try {
+				label = lines.get(i);
+				bases = lines.get(i + 1);
+			} catch (IndexOutOfBoundsException e) {
+				throw new IllegalStateException("File is improperly " +
+					"formatted!");
+			}
 			
 			/* Transform label-bases pair into a Strand */
 			Strand current = null;
@@ -58,11 +64,11 @@ public class StrandReader {
 				current = new Strand(label, bases);
 				DNA.add(current);
 			} catch (IllegalArgumentException e) {
-				System.err.println("Invalid nucleotide present in '" +
-					bases + "'.");
+				throw new IllegalArgumentException(
+					"Invalid nucleotide present in '" + bases + "'.");
 			} catch (IllegalStateException e) {
-				System.err.println("Too many nucleotides in '" +
-					bases + "'!");
+				throw new IllegalStateException(
+					"Too many nucleotides in '" + bases + "'!");
 			} finally {
 				System.out.println("...");
 			}

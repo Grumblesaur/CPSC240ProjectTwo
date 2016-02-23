@@ -76,4 +76,27 @@ public class Strand {
 	public String toString() {
 		return strandName + ": " + nucleotides;
 	}
+	
+	/** Determine index of matching point in first string for a substring in
+	 * second string.
+	 * @return An array of ints, whose first element is the index of the
+	 * matching substring in the first string, and whose second element is
+	 * the index of the matching substring in the second string.
+	 * @param other The second Strand.
+	 * @param threshold The length of the match substring.
+	 */
+	public int[] matchIndex(Strand other, int threshold) {
+		String sub = "";
+		int[] temp = {-1, -1};
+		for (int i = 0; i < other.nucleotides.length() - threshold; i++) {
+			sub = other.nucleotides.substring(i, i + threshold);
+			if (this.nucleotides.contains(sub)) {
+				temp[0] = this.nucleotides.indexOf(sub);
+				temp[1] = i;
+			}
+		}
+		return temp;
+	}
+	
+	
 }

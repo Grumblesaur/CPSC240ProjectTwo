@@ -1,0 +1,9 @@
+4
+strandOne
+gagttcgat
+strandTwo
+gatagacct
+strandThree
+cctattatgcg
+strandFour
+atgcgaggct
