@@ -59,15 +59,8 @@ public class Strand {
 	/** Obtain nucleotides as a string.
 	 * @return A String, nucleotides.
 	 */
-	public String getStringNucleotides() {
+	public String getNucleotides() {
 		return nucleotides;
-	}
-	
-	/** Obtain nucleotides as a character array.
-	 * @return A char[], the characters in this.nucleotides.
-	 */
-	public char[] getArrayNucleotides() {
-		return nucleotides.toCharArray();
 	}
 	
 	/** Create a String representation of the Strand for terminal output.
@@ -77,8 +70,8 @@ public class Strand {
 		return strandName + ": " + nucleotides;
 	}
 	
-	/** Determine index of matching point in first string for a substring in
-	 * second string.
+	/** Determine index of matching point in first nucleotide String for a
+	 * substring in second nucleotide String.
 	 * @return An array of ints, whose first element is the index of the
 	 * matching substring in the first string, and whose second element is
 	 * the index of the matching substring in the second string.
@@ -98,5 +91,78 @@ public class Strand {
 		return temp;
 	}
 	
+	/** Obtain length of Strand's nucleotide String.
+	 * @return An int, the length of the Strand's nucleotide String.
+	 */
+	public int length() {
+		return this.nucleotides.length();
+	}
 	
+	/** Splice two Strands together based on nucleotide substring positions.
+	 * @param other The second of the two Strands to be spliced.
+	 * @param firstOffset The position of the target nucleotide substring in
+	 * the calling object.
+	 * @param secondOffset The position of the target nucleotide substring
+	 * in the argument passed to other.
+	 * @param threshold An int that describes the length of the target
+	 * nucleotide substring.
+	 * @return A new Strand whose name and nucleotide fields are a
+	 * combination of the first and second Strand's name and nucleotide
+	 * fields.
+	 */
+	public Strand splice(Strand other, int firstOffset, int secondOffset,
+		int threshold) {
+		boolean spliceError = false;
+		
+		/* Do nucleotide strings neatly overlap? */
+		if (firstOffset > secondOffset) {
+			/* first + second */
+			if ((this.length() - firstOffset) != threshold ||
+				(0 + threshold) != secondOffset) {
+				spliceError = true;
+			}
+		} else if (secondOffset > firstOffset) {
+			/* second + first */
+			if ((other.length() - secondOffset) != threshold ||
+				(0 + threshold) != firstOffset) {
+				spliceError = true;
+			}
+		} else if (secondOffset == firstOffset) {
+			/* first & second have matching heads, tails, or other invalid
+				splice condition */
+			spliceError = true;
+		}
+		
+		if (spliceError) {
+			throw new Error("Strands cannot be spliced!");
+		}
+				
+		
+		/* If second strand is included in first strand with no additional
+			characters to attach to the nucleotide string, do nothing.
+		*/
+		String label = this.getStrandName() + other.getStrandName();
+		String bases = "";
+		String firstBases = this.getNucleotides();
+		String secondBases = other.getNucleotides();
+		if (threshold == other.length()) {
+			return this;
+		}
+		
+		/* Splice first + second */
+		if (firstOffset > secondOffset) {
+			firstBases = firstBases.replace(firstBases.substring(
+				firstOffset, firstOffset + threshold), "");
+			bases = firstBases + secondBases;
+		} else {
+			/* Spliace second + first */
+			secondBases = secondBases.replace(secondBases.substring(
+				secondOffset, secondOffset + threshold), "");
+			bases = secondBases + firstBases;
+		}
+		
+		return new Strand(label, bases);
+		
+		
+	}
 }
