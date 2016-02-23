@@ -1,19 +1,19 @@
 78 lines in file 'StrandReader.java'.
-1 lines of code.
-69 lines of comments.
+25 lines of code.
+45 lines of comments.
 8 lines of whitespace.
 
 168 lines in file 'Strand.java'.
-48 lines of code.
-97 lines of comments.
+78 lines of code.
+67 lines of comments.
 23 lines of whitespace.
 
 70 lines in file 'Sequencer.java'.
-4 lines of code.
-59 lines of comments.
+9 lines of code.
+54 lines of comments.
 7 lines of whitespace.
 
 316 lines in files overall.
-53 lines of code.
-225 lines of comments.
+112 lines of code.
+166 lines of comments.
 38 lines of whitespace.

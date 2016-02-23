@@ -70,26 +70,21 @@ public class Strand {
 		return strandName + ": " + nucleotides;
 	}
 	
-	/** Determine index of matching point in first nucleotide String for a
-	 * substring in second nucleotide String.
-	 * @return An array of ints, whose first element is the index of the
-	 * matching substring in the first string, and whose second element is
-	 * the index of the matching substring in the second string.
+	/** Determine whether regions of two nucleotide strings match.
+	 * @return A boolean indicating that the regions matched. 
 	 * @param other The second Strand.
 	 * @param threshold The length of the match substring.
+	 * @param toffset The index at which to start matching in the first
+	 * Strand's nucleotide array.
+	 * @param ooffset The index at which to start matching in the second
+	 * Strand's nucleotide array.
 	 */
-	public int[] matchIndex(Strand other, int threshold) {
-		String sub = "";
-		int[] temp = {-1, -1};
-		for (int i = 0; i < other.nucleotides.length() - threshold; i++) {
-			sub = other.nucleotides.substring(i, i + threshold);
-			if (this.nucleotides.contains(sub)) {
-				temp[0] = this.nucleotides.indexOf(sub);
-				temp[1] = i;
-			}
-		}
-		return temp;
+	public boolean matchRegion(int toffset, Strand other, int ooffset,
+		 int threshold) {
+		return this.nucleotides.regionMatches(toffset, other, ooffset,
+			threshold);
 	}
+	
 	
 	/** Obtain length of Strand's nucleotide String.
 	 * @return An int, the length of the Strand's nucleotide String.
@@ -100,9 +95,9 @@ public class Strand {
 	
 	/** Splice two Strands together based on nucleotide substring positions.
 	 * @param other The second of the two Strands to be spliced.
-	 * @param firstOffset The position of the target nucleotide substring in
+	 * @param toffset The position of the target nucleotide substring in
 	 * the calling object.
-	 * @param secondOffset The position of the target nucleotide substring
+	 * @param ooffset The position of the target nucleotide substring
 	 * in the argument passed to other.
 	 * @param threshold An int that describes the length of the target
 	 * nucleotide substring.
@@ -110,59 +105,10 @@ public class Strand {
 	 * combination of the first and second Strand's name and nucleotide
 	 * fields.
 	 */
-	public Strand splice(Strand other, int firstOffset, int secondOffset,
+	public Strand splice(Strand other, int toffset, int ooffset,
 		int threshold) {
-		boolean spliceError = false;
-		
-		/* Do nucleotide strings neatly overlap? */
-		if (firstOffset > secondOffset) {
-			/* first + second */
-			if ((this.length() - firstOffset) != threshold ||
-				(secondOffset - threshold) == 0) {
-				spliceError = true;
-			}
-		} else if (secondOffset > firstOffset) {
-			/* second + first */
-			if ((other.length() - secondOffset) != threshold ||
-				(firstOffset - threshold) == 0) {
-				spliceError = true;
-			}
-		} else if (secondOffset == firstOffset) {
-			/* first & second have matching heads, tails, or other invalid
-				splice condition */
-			spliceError = true;
-		}
-		
-		if (spliceError) {
-			throw new InvalidStateException("Strands cannot be spliced!");
-		}
-				
-		
-		/* If second strand is included in first strand with no additional
-			characters to attach to the nucleotide string, do nothing.
-		*/
-		String label = this.getStrandName() + other.getStrandName();
-		String bases = "";
-		String firstBases = this.getNucleotides();
-		String secondBases = other.getNucleotides();
-		if (threshold == other.length()) {
-			return this;
-		}
-		
-		/* Splice first + second */
-		if (firstOffset > secondOffset) {
-			firstBases = firstBases.replace(firstBases.substring(
-				firstOffset, firstOffset + threshold), "");
-			bases = firstBases + secondBases;
-		} else {
-			/* Spliace second + first */
-			secondBases = secondBases.replace(secondBases.substring(
-				secondOffset, secondOffset + threshold), "");
-			bases = secondBases + firstBases;
-		}
-		
-		return new Strand(label, bases);
 		
 		
-	}
+		
+	}		
 }

@@ -47,24 +47,53 @@ public class Sequencer {
 			System.out.println(s.toString());
 		}
 	
-		//TODO: matching algorithm
-		//TEST:
-		System.out.println("For threshold = " +
-			Integer.toString(threshold));
+		/* Match logic */
+		// for convenience, try to start with the largest Strand
+		Strand target = null;
+		int length = 0;
 		for (Strand s : sequences) {
-			for (Strand z : sequences) {
-				if (s == z) {
-					System.out.println("s == z; skipped");
-					continue;
-				}
-				int[] temp = s.matchIndex(z, threshold);
-				if (temp[1] == -1) {
-					System.out.println("s does not match with z");
-				} else {
-					System.out.println("s at " + Integer.toString(temp[0]) +
-					" matches z at " + Integer.toString(temp[1]));
-				}		
+			if (s.length() > length) {
+				length = s.length;
+				target = s;
 			}
 		}
+		
+		List<Strand> matched = new List<Strand>();
+		matched.append(target);
+		boolean failure = false;
+		for (Strand s : sequences) {
+			if (s == target) {
+				continue;
+			}
+			
+			if (target.matchRegion(target.length() - threshold, s, 0,
+				threshold)) {
+				target = target.splice(s, target.length() - threshold, 0,
+					threshold);
+				matched.append(s);
+			} else if (target.matchRegion(0, s, s.length() - threshold,
+				threshold)) {
+				target = s.splice(target, s.length - threshold, 0,
+					threshold);
+				matched.append(s);
+			} else {
+				System.err.println("Strand " + s.toString() + " could not"
+					+ " be matched!");
+				failure = true;
+				break;
+			}
+		}
+		
+		if (failure) {
+			System.err.println("Sequenced: " + target.toString());
+			System.err.println("Remaining: ");
+			for (Strand r : matched) {
+				System.err.println("\t" + r.toString());
+			}
+		} else {
+			System.err.println("Strands fully sequenced. Result: " +
+				target.getNucleotides());
+		}
+			
 	}
 }
