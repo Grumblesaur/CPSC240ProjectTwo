@@ -64,7 +64,7 @@ public class Sequencer {
 					System.out.println("s at " + Integer.toString(temp[0]) +
 					" matches z at " + Integer.toString(temp[1]));
 				}		
-		}
+			}
 		}
 	}
 }
