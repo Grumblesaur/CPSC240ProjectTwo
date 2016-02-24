@@ -1,9 +1,9 @@
 4
-strandOne
-gagttcgat
-strandTwo
-gatagacct
-strandThree
-cctattatgcg
-strandFour
-atgcgaggct
+bigjoe
+tttgaggttgagatccctgtgcgatcac
+propaneman
+ggatagcttt
+littletimmy
+tagc
+lemonysnicket
+cactactacttcag

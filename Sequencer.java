@@ -5,6 +5,9 @@
 import java.util.Scanner;
 import java.util.ArrayList;
 
+import java.lang.IllegalArgumentException;
+import java.lang.IllegalStateException;
+
 public class Sequencer {
 	public static void main(String[] args) {
 		/* Initialize system resources */
@@ -40,54 +43,92 @@ public class Sequencer {
 		
 		/* Retrieve strand data */
 		sr = new StrandReader(filename);
-		sequences = sr.parse();
+		try {
+			sequences = sr.parse();
+		} catch(IllegalArgumentException e) {
+			System.err.println(e.getMessage());
+			System.exit(1);
+		} catch(IllegalStateException e) {
+			System.err.println(e.getMessage());
+			System.exit(1);
+		}
 		
 		//TEST:
 		for (Strand s : sequences) {
 			System.out.println(s.toString());
 		}
-	
-		/* Match logic */
-		// for convenience, try to start with the largest Strand
+		
+		/* Begin matching logic with largest strand */
 		Strand target = null;
 		int length = 0;
 		for (Strand s : sequences) {
 			if (s.length() > length) {
-				length = s.length;
+				length = s.length();
 				target = s;
 			}
 		}
 		
-		List<Strand> matched = new List<Strand>();
-		matched.append(target);
-		boolean failure = false;
-		for (Strand s : sequences) {
-			if (s == target) {
-				continue;
+		ArrayList<Strand> matched = new ArrayList<Strand>();
+		matched.add(target);
+		sequences.remove(target);
+		boolean failure = false, removep = false;
+		int iterationsLeft = sequences.size() + 1;
+		Strand temp = null;
+		while (iterationsLeft >= 0) {
+			for (Strand s : sequences) {
+				removep = false;
+				/* Don't add yourself. */
+				if (s == target) {
+					continue;
+				}
+				/* Match-Splice Logic */
+				if (target.equals(s)) {
+					/* identical nucleotides */
+					removep = true;
+				} else if (target.matchRegion(target.length() - threshold,
+					s, 0, threshold)) {
+					/* target + s */
+					target = target.splice(s, target.length() - threshold,
+					0, threshold);
+					removep = true;
+				} else if (target.matchRegion(0, s, s.length() - threshold,
+					threshold)) {
+					/* s + target */
+					target = s.splice(target, s.length() - threshold, 0,
+					threshold);
+					removep = true;
+				} else if (target.contains(s)) {
+					/* s in target */
+					removep = true;
+				} else {
+					System.err.println("Strand " + s.toString() +
+					" not yet matched!");
+				}
+				
+				/* Add to our matched list and break out of inner loop. */
+				if (removep) {
+					matched.add(s);
+					temp = s;
+					break;
+				}
 			}
 			
-			if (target.matchRegion(target.length() - threshold, s, 0,
-				threshold)) {
-				target = target.splice(s, target.length() - threshold, 0,
-					threshold);
-				matched.append(s);
-			} else if (target.matchRegion(0, s, s.length() - threshold,
-				threshold)) {
-				target = s.splice(target, s.length - threshold, 0,
-					threshold);
-				matched.append(s);
-			} else {
-				System.err.println("Strand " + s.toString() + " could not"
-					+ " be matched!");
-				failure = true;
-				break;
+			/* Removing from a collection during iteration causes runtime
+				exceptions. Perform removal in non-iterating outer loop.
+			*/
+			if (removep) {
+				sequences.remove(temp);
 			}
+			iterationsLeft--;
 		}
 		
-		if (failure) {
+		System.out.println("");
+		
+		if (!sequences.isEmpty()) {
+			System.err.println("Error! Could not complete master strand!");
 			System.err.println("Sequenced: " + target.toString());
 			System.err.println("Remaining: ");
-			for (Strand r : matched) {
+			for (Strand r : sequences) {
 				System.err.println("\t" + r.toString());
 			}
 		} else {
@@ -95,5 +136,9 @@ public class Sequencer {
 				target.getNucleotides());
 		}
 			
+	}
+	// Used to ease debugging; DEBUG() calls removed from final program
+	static void DEBUG(String message) {
+		System.out.println(message);
 	}
 }

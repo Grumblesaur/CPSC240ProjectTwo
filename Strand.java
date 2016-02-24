@@ -5,7 +5,6 @@
  * Lab 5 / Writing Clases (Class File)
  */
 
-
 /* Exceptions */
 import java.lang.IllegalArgumentException;
 import java.lang.IllegalStateException;
@@ -81,11 +80,26 @@ public class Strand {
 	 */
 	public boolean matchRegion(int toffset, Strand other, int ooffset,
 		 int threshold) {
-		return this.nucleotides.regionMatches(toffset, other, ooffset,
-			threshold);
+		return this.nucleotides.regionMatches(toffset,
+			other.getNucleotides(), ooffset, threshold);
 	}
 	
+	/** Determine whether a Strand is contained within another Strand.
+	 * @return A boolean value indicating that the Strand was found within
+	 * the other strand.
+	 * @param other The smaller strand.
+	 */
+	public boolean contains(Strand other) {
+		return this.nucleotides.contains(other.nucleotides);
+	}
 	
+	/** Determine whether two Strands have identical nucleotides.
+	 * @return A boolean value indicating whether two Strands are the same.
+	 */
+	public boolean equals(Strand other) {
+		return this.nucleotides.equals(other.nucleotides);
+	}
+		
 	/** Obtain length of Strand's nucleotide String.
 	 * @return An int, the length of the Strand's nucleotide String.
 	 */
@@ -107,8 +121,12 @@ public class Strand {
 	 */
 	public Strand splice(Strand other, int toffset, int ooffset,
 		int threshold) {
+		String first = this.getNucleotides();
+		String second = other.getNucleotides();
+		String overlap = first.substring(toffset, toffset + threshold);
+		first = first.replace(overlap, "");
 		
-		
-		
+		return new Strand(this.getStrandName() + other.getStrandName(),
+			first + second);
 	}		
 }
