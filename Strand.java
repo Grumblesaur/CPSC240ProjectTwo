@@ -92,29 +92,18 @@ public class Strand {
 	}
 	
 	/** Determine if a larger match can be found.
-	 * @return An integer representing the largest match that can be
-	 * performed on this pair of Strands.
-	 * @param toffset The index at which to start matching in the first
-	 * Strand's nucleotide String.
-	 * @param other The second strand.
-	 * @param ooffset The index at which to start matching in the second
-	 * Strand's nucleotide String.
-	 * @param threshold The minimum length of the match substring.
 	 */
-	public int maxMatchSize(int toffset, Strand other, int ooffset,
-		int threshold) {
-		boolean matching = true;
-		int i = 0;
-		while (matching) {
-			matching = matchRegion(toffset, other, ooffset, threshold + i);
-			if (!matching) {
-				break;
-			} else {
-				i++;
+	public int maxMatchSize(Strand other, int threshold) {
+		int max = -1;
+		for (int i = threshold; i < other.length() - threshold; i++) {
+			for (int j = 0; j + i < other.length() - threshold; j++) {
+				if (this.getNucleotides().contains(
+					other.getNucleotides().substring(j, j + i))) {
+					max = i;
+				}
 			}
-			System.out.println(Integer.toString(i));
 		}
-		return threshold + i;
+		return max;
 	}
 	
 	/** Determine whether a Strand is contained within another Strand.

@@ -81,17 +81,32 @@ public class Sequencer {
 				target Strand.
 			*/
 			for (Strand s : sequences) {
+				int prependMax = s.maxMatchSize(target, threshold);
+				int appendMax = target.maxMatchSize(s, threshold);
+				boolean prepend = prependMax >= threshold &&
+					prependMax > appendMax;
+				boolean append = appendMax >= threshold &&
+					appendMax > prependMax;
+				
+				DEBUG("prepend = " + Integer.toString(prependMax) + "\n" +
+					"append = " + Integer.toString(appendMax));
+				
 				removep = false;
 				if (target.contains(s) || target.equals(s)) {
 					removep = true;
 					target.setStrandName(target.getStrandName() +
 						s.getStrandName());
-				} else if (/* s is prepended to target */ false) {
-					// pass
-				} else if (/* s is appended to target */ false) {
-					// pass
-				} else { // s cannot yet be added to target
-					DEBUG("Strand " + s.toString() " still waiting to be " +
+				} else if (prepend) {
+					/* s is spliced onto the beginning of target */
+					target = s.splice(target, s.length() - prependMax,
+						0, prependMax);
+				} else if (append) {
+					/* s is spliced onto the end of target */
+					target = target.splice(s, target.length() - appendMax,
+						0, appendMax);
+				} else {
+					/* s cannot yet be added to target */
+					DEBUG("Strand " + s.toString()+" still waiting to be " +
 						"spliced");
 				}
 				/* Add to our matched list and break out of inner loop. */
@@ -122,7 +137,7 @@ public class Sequencer {
 				System.err.println("\t" + r.toString());
 			}
 		} else {
-			System.err.println("Strands fully sequenced. Result:\n" +
+			System.out.println("Strands fully sequenced. Result:\n" +
 				target.getNucleotides());
 		}
 			
