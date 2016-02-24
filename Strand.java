@@ -55,6 +55,13 @@ public class Strand {
 		return strandName;
 	}
 	
+	/** Change Strand's name.
+	 * @param name New Strand name.
+	 */
+	public void setStrandName(String name) {
+		strandName = name;
+	}
+	
 	/** Obtain nucleotides as a string.
 	 * @return A String, nucleotides.
 	 */
@@ -74,14 +81,40 @@ public class Strand {
 	 * @param other The second Strand.
 	 * @param threshold The length of the match substring.
 	 * @param toffset The index at which to start matching in the first
-	 * Strand's nucleotide array.
+	 * Strand's nucleotide String.
 	 * @param ooffset The index at which to start matching in the second
-	 * Strand's nucleotide array.
+	 * Strand's nucleotide String.
 	 */
 	public boolean matchRegion(int toffset, Strand other, int ooffset,
 		 int threshold) {
 		return this.nucleotides.regionMatches(toffset,
 			other.getNucleotides(), ooffset, threshold);
+	}
+	
+	/** Determine if a larger match can be found.
+	 * @return An integer representing the largest match that can be
+	 * performed on this pair of Strands.
+	 * @param toffset The index at which to start matching in the first
+	 * Strand's nucleotide String.
+	 * @param other The second strand.
+	 * @param ooffset The index at which to start matching in the second
+	 * Strand's nucleotide String.
+	 * @param threshold The minimum length of the match substring.
+	 */
+	public int maxMatchSize(int toffset, Strand other, int ooffset,
+		int threshold) {
+		boolean matching = true;
+		int i = 0;
+		while (matching) {
+			matching = matchRegion(toffset, other, ooffset, threshold + i);
+			if (!matching) {
+				break;
+			} else {
+				i++;
+			}
+			System.out.println(Integer.toString(i));
+		}
+		return threshold + i;
 	}
 	
 	/** Determine whether a Strand is contained within another Strand.
@@ -128,5 +161,6 @@ public class Strand {
 		
 		return new Strand(this.getStrandName() + other.getStrandName(),
 			first + second);
-	}		
+	}
+	
 }

@@ -21,17 +21,17 @@ public class Sequencer {
 			entered correctly. */
 		if (args.length == 2) {
 			try {
-				filename = args[0];
-				threshold = Integer.parseInt(args[1]);
+				filename = args[1];
+				threshold = Integer.parseInt(args[0]);
 			} catch (Exception e) {
 				System.err.println("Usage: java Sequencer file threshold");
 				System.exit(1);
 			}
 		} else {
-			System.out.print("Enter DNA file list: ");
-			filename = input.nextLine();
 			System.out.print("Enter match threshold (min = 1): ");
 			threshold = input.nextInt();
+			System.out.print("Enter DNA file list: ");
+			filename = input.next();
 		}
 		
 		/* Refuse to match zero or negative nucleotides. */
@@ -53,11 +53,6 @@ public class Sequencer {
 			System.exit(1);
 		}
 		
-		//TEST:
-		for (Strand s : sequences) {
-			System.out.println(s.toString());
-		}
-		
 		/* Begin matching logic with largest strand */
 		Strand target = null;
 		int length = 0;
@@ -68,43 +63,37 @@ public class Sequencer {
 			}
 		}
 		
+		/* Initialize ArrayList to track confirmed sequence matches. */
 		ArrayList<Strand> matched = new ArrayList<Strand>();
 		matched.add(target);
 		sequences.remove(target);
-		boolean failure = false, removep = false;
-		int iterationsLeft = sequences.size() + 1;
+		
+		/* Initialize variables to control Strand confirmation and loop
+			iteration.
+		*/
+		boolean removep = false;
+		int iterationsLeft = sequences.size();
 		Strand temp = null;
+		
+		/* Loop for every item in the list of sequences */
 		while (iterationsLeft >= 0) {
+			/* Attempt to match and splice each Strand with the current
+				target Strand.
+			*/
 			for (Strand s : sequences) {
 				removep = false;
-				/* Don't add yourself. */
-				if (s == target) {
-					continue;
+				if (target.contains(s) || target.equals(s)) {
+					removep = true;
+					target.setStrandName(target.getStrandName() +
+						s.getStrandName());
+				} else if (/* s is prepended to target */ false) {
+					// pass
+				} else if (/* s is appended to target */ false) {
+					// pass
+				} else { // s cannot yet be added to target
+					DEBUG("Strand " + s.toString() " still waiting to be " +
+						"spliced");
 				}
-				/* Match-Splice Logic */
-				if (target.equals(s)) {
-					/* identical nucleotides */
-					removep = true;
-				} else if (target.matchRegion(target.length() - threshold,
-					s, 0, threshold)) {
-					/* target + s */
-					target = target.splice(s, target.length() - threshold,
-					0, threshold);
-					removep = true;
-				} else if (target.matchRegion(0, s, s.length() - threshold,
-					threshold)) {
-					/* s + target */
-					target = s.splice(target, s.length() - threshold, 0,
-					threshold);
-					removep = true;
-				} else if (target.contains(s)) {
-					/* s in target */
-					removep = true;
-				} else {
-					System.err.println("Strand " + s.toString() +
-					" not yet matched!");
-				}
-				
 				/* Add to our matched list and break out of inner loop. */
 				if (removep) {
 					matched.add(s);
@@ -124,6 +113,7 @@ public class Sequencer {
 		
 		System.out.println("");
 		
+		/* Check for success or failure of process. */
 		if (!sequences.isEmpty()) {
 			System.err.println("Error! Could not complete master strand!");
 			System.err.println("Sequenced: " + target.toString());
@@ -132,7 +122,7 @@ public class Sequencer {
 				System.err.println("\t" + r.toString());
 			}
 		} else {
-			System.err.println("Strands fully sequenced. Result: " +
+			System.err.println("Strands fully sequenced. Result:\n" +
 				target.getNucleotides());
 		}
 			
