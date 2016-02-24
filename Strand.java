@@ -76,22 +76,11 @@ public class Strand {
 		return strandName + ": " + nucleotides;
 	}
 	
-	/** Determine whether regions of two nucleotide strings match.
-	 * @return A boolean indicating that the regions matched. 
-	 * @param other The second Strand.
-	 * @param threshold The length of the match substring.
-	 * @param toffset The index at which to start matching in the first
-	 * Strand's nucleotide String.
-	 * @param ooffset The index at which to start matching in the second
-	 * Strand's nucleotide String.
-	 */
-	public boolean matchRegion(int toffset, Strand other, int ooffset,
-		 int threshold) {
-		return this.nucleotides.regionMatches(toffset,
-			other.getNucleotides(), ooffset, threshold);
-	}
-	
-	/** Determine if a larger match can be found.
+	/** Determine size of largest match.
+	 * @param other Another Strand object.
+	 * @param threshold The minimum number of nucleotides required to match.
+	 * @return An int determining the largest possible match or -1 if none
+	 * were possible.
 	 */
 	public int maxMatchSize(Strand other, int threshold) {
 		int max = -1;
